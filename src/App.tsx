@@ -8,6 +8,7 @@ import Farmers from './components/Farmers';
 import Agent from './components/Agent';
 import BankAgent from './components/BankAgent';
 import FarmerDetails from './components/FarmerDetails';
+import FPO from './components/FPO';
 
 function App() {
  
@@ -19,7 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/staff" element={<Staff />} />
+          <Route path="/fpo" element={<FPO />} />
           <Route path="/farmers" element={<Farmers />} />
           <Route path="/agent" element={<Agent />} />
           <Route path="/bank-agent" element={<BankAgent />} />
