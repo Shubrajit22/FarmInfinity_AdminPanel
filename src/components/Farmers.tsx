@@ -1,9 +1,17 @@
-
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+interface ApiFarmer {
+  id: string;
+  farmer_id: string;
+  phone_no: string;
+  referral_id: string | null;
+  name: string | null;
+  village: string | null;
+  status: number | null;
+  created_at: string;
+  updated_at: string;
+}
 const Farmers = () => {
   const navigate = useNavigate();
 
@@ -64,21 +72,35 @@ const Farmers = () => {
   useEffect(() => {
     const fetchFarmers = async () => {
       const token = localStorage.getItem("keycloak-token");
-  
+
       if (!token) {
         setError("No auth token found. Please login again.");
         setLoading(false);
         return;
       }
-  
+
       try {
         const response = await axios.get("https://dev-api.farmeasytechnologies.com/api/farmers/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
-        setFarmers([...hardcodedFarmers, ...response.data]);
+
+        // Adjust the data mapping to match the API response structure
+        const fetchedFarmers = response.data.data.map((farmer: ApiFarmer) => ({
+          id: farmer.id,
+          name: farmer.name || "N/A", // Handle cases where name is null
+          gender: "N/A", // Gender is not present in the API response
+          phone: farmer.phone_no,
+          city: farmer.village || "N/A", // Assuming 'village' maps to city
+          createdOn: new Date(farmer.created_at).toLocaleDateString(), // Format the date
+          status: getStatusText(farmer.status), // Function to convert status code to text
+          approval: "N/A", // Approval is not present in the API response
+          amount: "N/A", // Amount is not present in the API response
+          // You might need to fetch additional details for gender, approval, and amount
+        }));
+
+        setFarmers([...hardcodedFarmers, ...fetchedFarmers]);
       } catch (err) {
         console.error("Error fetching farmers:", err);
         setError("Failed to fetch farmer data. Check token or permissions.");
@@ -86,15 +108,26 @@ const Farmers = () => {
         setLoading(false);
       }
     };
-  
+
     fetchFarmers();
   }, []);
-  
+
+  const getStatusText = (status: Number|null) => {
+    switch (status) {
+      case 1:
+        return "Lead";
+      case 2:
+        return "Contacted";
+      // Add more status mappings as needed based on your API documentation
+      default:
+        return "Unknown";
+    }
+  };
 
   // Filtered farmers based on search query
   const filteredFarmers = farmers.filter(
     (farmer) =>
-      farmer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (farmer.name && farmer.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       farmer.phone.includes(searchQuery)
   );
 
@@ -124,6 +157,8 @@ const Farmers = () => {
         <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700">
           <option>All Statuses</option>
           <option>Lead</option>
+          <option>Contacted</option>
+          {/* Add more status options based on your getStatusText function */}
         </select>
       </div>
 
