@@ -134,7 +134,7 @@ const FarmerDetails = () => {
         setLoading(true);
         // Fetch farmer details
         const farmerResponse: AxiosResponse<FarmerDetailsData> = await axios.get(
-          `https://dev-api.farmeasytechnologies.com/api/farmers/${id}/`,
+          `https://dev-api.farmeasytechnologies.com/api/farmer/${id}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
