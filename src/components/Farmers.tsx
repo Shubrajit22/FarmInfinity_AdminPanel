@@ -63,24 +63,33 @@ const Farmers = () => {
 
   useEffect(() => {
     const fetchFarmers = async () => {
+      const token = localStorage.getItem("keycloak-token");
+  
+      if (!token) {
+        setError("No auth token found. Please login again.");
+        setLoading(false);
+        return;
+      }
+  
       try {
-        const response = await axios.get("http://localhost:3000/api/farmers", {
+        const response = await axios.get("https://dev-api.farmeasytechnologies.com/api/farmers/", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("keycloak-token")}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-
+  
         setFarmers([...hardcodedFarmers, ...response.data]);
       } catch (err) {
         console.error("Error fetching farmers:", err);
-        setError("Failed to fetch farmer data.");
+        setError("Failed to fetch farmer data. Check token or permissions.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchFarmers();
   }, []);
+  
 
   // Filtered farmers based on search query
   const filteredFarmers = farmers.filter(
