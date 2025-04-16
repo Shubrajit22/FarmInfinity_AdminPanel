@@ -1,146 +1,89 @@
-import  { useEffect, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import axios, { AxiosResponse } from 'axios';
 
-const Agent = () => {
-  const [agents, setAgents] = useState([
-    {
-      "id": "FARMER001",
-      "agent_id": "AGENT001",
-      "first_name": "John",
-      "middle_name": "Doe",
-      "last_name": "Smith",
-      "registered_phone": "9876543210",
-      "profession": "Farmer",
-      "qualification": "B.Sc Agriculture",
-      "address": "123 Farm Lane, Village Green, UP",
-      "pan": "ABCDE1234F",
-      "poa_image": "https://example.com/poa/FARMER001.jpg",
-      "bank_account_no": "1234567890123456",
-      "bank_name": "State Bank of India",
-      "ifsc_code": "SBIN0001234",
-      "alternate_phone": "9876543220",
-      "fpo_reference_no": "FPO001",
-      "is_mapped": false,
-      "active": true,
-      "created_at": "2025-04-01T12:00:00Z",
-      "updated_at": "2025-04-01T12:00:00Z"
-    },
-    {
-      "id": "FARMER002",
-      "agent_id": "AGENT002",
-      "first_name": "Alice",
-      "middle_name": "Mary",
-      "last_name": "Johnson",
-      "registered_phone": "9876543211",
-      "profession": "Farmer",
-      "qualification": "M.Sc Agriculture",
-      "address": "456 Rural Road, Greenfield, Haryana",
-      "pan": "XYZAB1234G",
-      "poa_image": "https://example.com/poa/FARMER002.jpg",
-      "bank_account_no": "6543210987654321",
-      "bank_name": "HDFC Bank",
-      "ifsc_code": "HDFC0001234",
-      "alternate_phone": "9876543221",
-      "fpo_reference_no": "FPO002",
-      "is_mapped": true,
-      "active": true,
-      "created_at": "2025-04-02T12:00:00Z",
-      "updated_at": "2025-04-02T12:00:00Z"
-    },
-    {
-      "id": "FARMER003",
-      "agent_id": "AGENT003",
-      "first_name": "David",
-      "middle_name": "Lee",
-      "last_name": "Brown",
-      "registered_phone": "9876543212",
-      "profession": "Farmer",
-      "qualification": "Diploma in Horticulture",
-      "address": "789 Orchard Blvd, Sunnyvale, Punjab",
-      "pan": "LMNOP5678P",
-      "poa_image": "https://example.com/poa/FARMER003.jpg",
-      "bank_account_no": "7890123456789012",
-      "bank_name": "Punjab National Bank",
-      "ifsc_code": "PNB0001234",
-      "alternate_phone": "9876543222",
-      "fpo_reference_no": "FPO003",
-      "is_mapped": false,
-      "active": true,
-      "created_at": "2025-04-03T12:00:00Z",
-      "updated_at": "2025-04-03T12:00:00Z"
-    }
-  ]
-  );
+interface AgentData {
+  id: string;
+  agent_id: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  registered_phone: string;
+  profession: string;
+  qualification: string;
+  address: string;
+  pan: string;
+  poa_image: string;
+  bank_account_no: string;
+  bank_name: string;
+  ifsc_code: string;
+  alternate_phone: string;
+  fpo_reference_no: string;
+  is_mapped: boolean;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+const Agent= () => {
+  const [agents, setAgents] = useState<AgentData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    const fetchAgentsData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/agents", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("keycloak-token")}`,
-          },
-        });
+        setLoading(true);
+        const response: AxiosResponse<AgentData[]> = await axios.get(
+          `https://dev-api.farmeasytechnologies.com/api/field_agents/?skip=0&limit=10`
+        );
         setAgents(response.data);
-      } catch (error) {
-        console.error("Error fetching agents:", error);
+      } catch (err: any) {
+        setError(`Error fetching agent data: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAgents();
+    fetchAgentsData();
   }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">🧑‍💼 Agent List</h1>
+  if (loading) {
+    return <div className="p-4">Loading agents...</div>;
+  }
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
 
-      {loading ? (
-        <div className="text-gray-500">Loading agents...</div>
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Agent Details</h1>
+      {agents.length === 0 ? (
+        <div className="text-gray-500">No agents to display.</div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-          <table className="min-w-full table-auto text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Name</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Phone</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Profession</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Qualification</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Bank</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">FPO Ref</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agents.map((agent) => (
-                <tr key={agent.id} className="border-t hover:bg-gray-50">
-                  <td className="px-4 py-2">{`${agent.first_name} ${agent.middle_name} ${agent.last_name}`}</td>
-                  <td className="px-4 py-2">{agent.registered_phone}</td>
-                  <td className="px-4 py-2">{agent.profession}</td>
-                  <td className="px-4 py-2">{agent.qualification}</td>
-                  <td className="px-4 py-2">{agent.bank_name}</td>
-                  <td className="px-4 py-2">{agent.fpo_reference_no}</td>
-                  <td className="px-4 py-2">
-                    <Link
-                      to={`/agent/${agent.id}`}
-                      className="text-blue-500 hover:underline"
-                    >
-                      View →
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {agents.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center text-gray-500 py-4">
-                    No agents found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {agents.map((agent) => (
+            <div key={agent.id} className="bg-white rounded-lg shadow-md p-4 space-y-2">
+              <div><strong>Agent ID:</strong> {agent.agent_id}</div>
+              <div><strong>First Name:</strong> {agent.first_name}</div>
+              <div><strong>Middle Name:</strong> {agent.middle_name}</div>
+              <div><strong>Last Name:</strong> {agent.last_name}</div>
+              <div><strong>Registered Phone:</strong> {agent.registered_phone}</div>
+              <div><strong>Profession:</strong> {agent.profession}</div>
+              <div><strong>Qualification:</strong> {agent.qualification}</div>
+              <div><strong>Address:</strong> {agent.address}</div>
+              <div><strong>PAN:</strong> {agent.pan}</div>
+              {agent.poa_image && <img src={agent.poa_image} alt="Proof of Address" className="w-64 rounded shadow" />}
+              <div><strong>Bank Account No:</strong> {agent.bank_account_no}</div>
+              <div><strong>Bank Name:</strong> {agent.bank_name}</div>
+              <div><strong>IFSC Code:</strong> {agent.ifsc_code}</div>
+              <div><strong>Alternate Phone:</strong> {agent.alternate_phone}</div>
+              <div><strong>FPO Reference No:</strong> {agent.fpo_reference_no}</div>
+              <div><strong>Is Mapped:</strong> {agent.is_mapped ? 'Yes' : 'No'}</div>
+              <div><strong>Active:</strong> {agent.active ? 'Yes' : 'No'}</div>
+              <div><strong>Created At:</strong> {agent.created_at}</div>
+              <div><strong>Updated At:</strong> {agent.updated_at}</div>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -148,3 +91,4 @@ const Agent = () => {
 };
 
 export default Agent;
+
