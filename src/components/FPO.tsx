@@ -1,183 +1,126 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import  { useState, useEffect } from 'react';
+import axios, { AxiosResponse } from 'axios';
+import { useParams } from 'react-router-dom';
 
-const Fpo = () => {
-  const [fpos, setFpos] = useState([
-    {
-      "id": "FPO001",
-      "fpo_id": "FPOID001",
-      "constitution": "Cooperative Society",
-      "entity_name": "Green Fields Farmers Organization",
-      "no_of_farmers": 120,
-      "address": "123 Agro Street, Village Green, Uttar Pradesh",
-      "state": "Uttar Pradesh",
-      "district": "Meerut",
-      "area_of_operation": 5000,
-      "establishment_year": "2010",
-      "major_crop_produced": [
-        "Wheat",
-        "Rice",
-        "Maize"
-      ],
-      "previous_year_turnover": 1500000,
-      "contact_person_name": "Rajesh Kumar",
-      "contact_person_phone": "+01233037605",
-      "pan_no": "ABCDE1234X",
-      "is_pan_copy_collected": true,
-      "pan_image": "https://example.com/pan/FPO001.jpg",
-      "is_incorporation_doc_collected": true,
-      "incorporation_doc_img": "https://example.com/incorporation/FPO001.jpg",
-      "is_registration_no_collected": true,
-      "registration_no": "FPO001REG",
-      "registration_no_img": "https://example.com/registration/FPO001REG.jpg",
-      "is_director_shareholder_list_collected": true,
-      "director_shareholder_list_image": "https://example.com/directors/FPO001.jpg",
-      "active": true,
-      "created_at": "2025-01-01T12:00:00Z",
-      "updated_at": "2025-01-01T12:00:00Z"
-    },
-    {
-      "id": "FPO002",
-      "fpo_id": "FPOID002",
-      "constitution": "Private Limited Company",
-      "entity_name": "Sunny Acres Farmers Association",
-      "no_of_farmers": 85,
-      "address": "456 Green Lane, Sunnyville, Haryana",
-      "state": "Haryana",
-      "district": "Rohtak",
-      "area_of_operation": 3500,
-      "establishment_year": "2015",
-      "major_crop_produced": [
-        "Cotton",
-        "Sugarcane",
-        "Groundnut"
-      ],
-      "previous_year_turnover": 2000000,
-      "contact_person_name": "Ravi Mehta",
-      "contact_person_phone": "+01233037605",
-      "pan_no": "XYZAB5678G",
-      "is_pan_copy_collected": true,
-      "pan_image": "https://example.com/pan/FPO002.jpg",
-      "is_incorporation_doc_collected": true,
-      "incorporation_doc_img": "https://example.com/incorporation/FPO002.jpg",
-      "is_registration_no_collected": true,
-      "registration_no": "FPO002REG",
-      "registration_no_img": "https://example.com/registration/FPO002REG.jpg",
-      "is_director_shareholder_list_collected": true,
-      "director_shareholder_list_image": "https://example.com/directors/FPO002.jpg",
-      "active": true,
-      "created_at": "2025-02-15T12:00:00Z",
-      "updated_at": "2025-02-15T12:00:00Z"
-    },
-    {
-      "id": "FPO003",
-      "fpo_id": "FPOID003",
-      "constitution": "Producer Company",
-      "entity_name": "Farmers United Co-operative",
-      "no_of_farmers": 200,
-      "address": "789 Agricultural Blvd, Greenfield, Punjab",
-      "state": "Punjab",
-      "district": "Ludhiana",
-      "area_of_operation": 7000,
-      "establishment_year": "2018",
-      "major_crop_produced": [
-        "Rice",
-        "Barley",
-        "Sunflower"
-      ],
-      "previous_year_turnover": 5000000,
-      "contact_person_name": "Manoj Singh",
-      "contact_person_phone": "+01233037605",
-      "pan_no": "LMNOP1234P",
-      "is_pan_copy_collected": true,
-      "pan_image": "https://example.com/pan/FPO003.jpg",
-      "is_incorporation_doc_collected": true,
-      "incorporation_doc_img": "https://example.com/incorporation/FPO003.jpg",
-      "is_registration_no_collected": true,
-      "registration_no": "FPO003REG",
-      "registration_no_img": "https://example.com/registration/FPO003REG.jpg",
-      "is_director_shareholder_list_collected": true,
-      "director_shareholder_list_image": "https://example.com/directors/FPO003.jpg",
-      "active": true,
-      "created_at": "2025-03-10T12:00:00Z",
-      "updated_at": "2025-03-10T12:00:00Z"
-    }
-  ]);
-  
+interface FPOData {
+  id: string;
+  fpo_id: string;
+  constitution: string;
+  entity_name: string;
+  no_of_farmers: number;
+  address: string;
+  state: string;
+  district: string;
+  area_of_operation: number;
+  establishment_year: string;
+  major_crop_produced: string[];
+  previous_year_turnover: number;
+  contact_person_name: string;
+  contact_person_phone: string;
+  pan_no: string;
+  is_pan_copy_collected: boolean;
+  pan_image: string;
+  is_incorporation_doc_collected: boolean;
+  incorporation_doc_img: string;
+  is_registration_no_collected: boolean;
+  registration_no: string;
+  registration_no_img: string;
+  is_director_shareholder_list_collected: boolean;
+  director_shareholder_list_image: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+const FPO = () => {
+  const { id } = useParams<{ id: string }>();  // Get the FPO ID from the route
+  const [fpo, setFpo] = useState<FPOData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchFpos = async () => {
+    const fetchFPOData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/fpos", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("keycloak-token")}`,
-          },
-        });
-        console.log("Fetched FPOs:", response.data); // Check API response
-        setFpos(response.data); // Replace the hardcoded data with fetched data
-      } catch (error) {
-        console.error("Error fetching FPOs:", error);
+        setLoading(true);
+        const response: AxiosResponse<FPOData[]> = await axios.get(
+          `https://dev-api.farmeasytechnologies.com/api/fpos/?skip=0&limit=10`
+        );
+
+        // Find the FPO with the matching ID
+        const foundFPO = response.data.find((item) => item.id === id);
+
+        if (foundFPO) {
+          setFpo(foundFPO);
+        } else {
+          setError(`FPO with ID ${id} not found.`);
+        }
+      } catch (err: any) {
+        setError(`Error fetching FPO data: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFpos();
-  }, []);
+    if (id) {
+        fetchFPOData();
+    }
+    else{
+        setError("FPO ID not provided")
+        setLoading(false)
+    }
+  }, [id]);
+
+  const renderFPOData = () => {
+    if (!fpo) {
+      return <div className="text-gray-500">No FPO data to display.</div>;
+    }
+
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">FPO Details</h2>
+        <div><strong>FPO ID:</strong> {fpo.fpo_id}</div>
+        <div><strong>Constitution:</strong> {fpo.constitution}</div>
+        <div><strong>Entity Name:</strong> {fpo.entity_name}</div>
+        <div><strong>Number of Farmers:</strong> {fpo.no_of_farmers}</div>
+        <div><strong>Address:</strong> {fpo.address}</div>
+        <div><strong>State:</strong> {fpo.state}</div>
+        <div><strong>District:</strong> {fpo.district}</div>
+        <div><strong>Area of Operation:</strong> {fpo.area_of_operation}</div>
+        <div><strong>Establishment Year:</strong> {fpo.establishment_year}</div>
+        <div><strong>Major Crops Produced:</strong> {fpo.major_crop_produced.join(', ')}</div>
+        <div><strong>Previous Year Turnover:</strong> {fpo.previous_year_turnover}</div>
+        <div><strong>Contact Person Name:</strong> {fpo.contact_person_name}</div>
+        <div><strong>Contact Person Phone:</strong> {fpo.contact_person_phone}</div>
+        <div><strong>PAN Number:</strong> {fpo.pan_no}</div>
+        <div><strong>PAN Copy Collected:</strong> {fpo.is_pan_copy_collected ? 'Yes' : 'No'}</div>
+        {fpo.pan_image && <img src={fpo.pan_image} alt="PAN" className="w-64 rounded shadow" />}
+        <div><strong>Incorporation Doc Collected:</strong> {fpo.is_incorporation_doc_collected ? 'Yes' : 'No'}</div>
+        {fpo.incorporation_doc_img && <img src={fpo.incorporation_doc_img} alt="Incorporation Doc" className="w-64 rounded shadow" />}
+        <div><strong>Registration Number Collected:</strong> {fpo.is_registration_no_collected ? 'Yes' : 'No'}</div>
+        <div><strong>Registration Number:</strong> {fpo.registration_no}</div>
+        {fpo.registration_no_img && <img src={fpo.registration_no_img} alt="Registration Number" className="w-64 rounded shadow" />}
+        <div><strong>Director Shareholder List Collected:</strong> {fpo.is_director_shareholder_list_collected ? 'Yes' : 'No'}</div>
+        {fpo.director_shareholder_list_image && <img src={fpo.director_shareholder_list_image} alt="Director Shareholder List" className="w-64 rounded shadow" />}
+        <div><strong>Active:</strong> {fpo.active ? 'Yes' : 'No'}</div>
+        <div><strong>Created At:</strong> {fpo.created_at}</div>
+        <div><strong>Updated At:</strong> {fpo.updated_at}</div>
+      </div>
+    );
+  };
+
+  if (loading) {
+    return <div className="p-4">Loading FPO details...</div>;
+  }
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">📋 FPO List</h1>
-
-      {loading ? (
-        <div className="text-gray-500">Loading FPOs...</div>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Entity Name</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">No. of Farmers</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">State</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">District</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Contact</th>
-                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fpos.length > 0 ? (
-                fpos.map((fpo) => (
-                  <tr key={fpo.id} className="border-t hover:bg-gray-50">
-                    <td className="px-4 py-2">{fpo.entity_name}</td>
-                    <td className="px-4 py-2">{fpo.no_of_farmers}</td>
-                    <td className="px-4 py-2">{fpo.state}</td>
-                    <td className="px-4 py-2">{fpo.district}</td>
-                    <td className="px-4 py-2">{fpo.contact_person_phone}</td>
-                    <td className="px-4 py-2">
-                      <Link
-                        to={`/fpo/${fpo.id}`}
-                        className="text-blue-500 hover:underline"
-                      >
-                        View Details →  
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="px-4 py-4 text-center text-gray-500" >
-                    No FPOs found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">FPO Details Page</h1>
+      {renderFPOData()}
     </div>
   );
 };
 
-export default Fpo;
+export default FPO;
