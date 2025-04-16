@@ -133,18 +133,18 @@ const FarmerDetails = () => {
       try {
         setLoading(true);
         // Fetch farmer details
-        const farmerResponse: AxiosResponse<FarmerDetailsData> = await axios.get(
-          `https://dev-api.farmeasytechnologies.com/api/farmer/${id}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setFarmer(farmerResponse.data);
+        // const farmerResponse: AxiosResponse<FarmerDetailsData> = await axios.get(
+        //   `https://dev-api.farmeasytechnologies.com/api/farmer/${id}/`,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   }
+        // );
+        // setFarmer(farmerResponse.data);
 
         // Fetch KYC
-        const kycResponse = await axios.get<KYCData>(`https://dev-api.farmeasytechnologies.com/api/kyc-histories/${farmerResponse.data.farmer_id}`, {
+        const kycResponse = await axios.get<KYCData>(`https://dev-api.farmeasytechnologies.com/api/kyc-histories/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
