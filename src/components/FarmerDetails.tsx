@@ -144,7 +144,7 @@ const FarmerDetails = () => {
         setFarmer(farmerResponse.data);
 
         // Fetch KYC
-        const kycResponse = await axios.get<KYCData>(`https://dev-api.farmeasytechnologies.com/api/kyc-histories/${farmerResponse.data.id}`, {
+        const kycResponse = await axios.get<KYCData>(`https://dev-api.farmeasytechnologies.com/api/kyc-histories/${farmerResponse.data.farmer_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
