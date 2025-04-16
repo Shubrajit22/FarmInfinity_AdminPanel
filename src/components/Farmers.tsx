@@ -189,7 +189,7 @@ const Farmers = () => {
                 {currentFarmers.map((farmer) => (
                   <tr
                     key={farmer.id}
-                    onClick={() => navigate(`/farmers/${farmer.id}`)}
+                    onClick={() => navigate(`api/farmers/${farmer.id}`)}
                     className="hover:bg-blue-50 cursor-pointer border-b"
                   >
                     <td className="px-4 py-3 font-medium text-gray-900">{farmer.name}</td>
