@@ -60,35 +60,48 @@ const FPO = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">All FPOs</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {fpos.map((fpo) => (
-          <div
-            key={fpo.id}
-            className="border border-gray-300 p-4 rounded-lg shadow-sm hover:shadow-md hover:border-blue-500 transition cursor-pointer"
-            onClick={() => setSelectedFPO(fpo)}
-          >
-            <h2 className="text-lg font-semibold text-blue-800">{fpo.entity_name}</h2>
-            <p><strong>FPO ID:</strong> {fpo.fpo_id}</p>
-            <p><strong>State:</strong> {fpo.state}</p>
-            <p><strong>District:</strong> {fpo.district}</p>
-            <p><strong>Contact:</strong> {fpo.contact_person_name} ({fpo.contact_person_phone})</p>
-            <p><strong>Status:</strong> {fpo.active ? 'Active' : 'Inactive'}</p>
-          </div>
-        ))}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+              <th className="px-4 py-2 border">Entity Name</th>
+              <th className="px-4 py-2 border">FPO ID</th>
+              <th className="px-4 py-2 border">State</th>
+              <th className="px-4 py-2 border">District</th>
+              <th className="px-4 py-2 border">Contact</th>
+              <th className="px-4 py-2 border">Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fpos.map((fpo) => (
+              <tr
+                key={fpo.id}
+                onClick={() => setSelectedFPO(fpo)}
+                className="cursor-pointer hover:bg-gray-50 text-sm"
+              >
+                <td className="px-4 py-2 border">{fpo.entity_name}</td>
+                <td className="px-4 py-2 border">{fpo.fpo_id}</td>
+                <td className="px-4 py-2 border">{fpo.state}</td>
+                <td className="px-4 py-2 border">{fpo.district}</td>
+                <td className="px-4 py-2 border">{fpo.contact_person_name} ({fpo.contact_person_phone})</td>
+                <td className="px-4 py-2 border">{fpo.active ? 'Yes' : 'No'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Modal */}
       {selectedFPO && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-start overflow-y-auto p-6">
-          <div className="bg-white max-w-5xl w-full rounded-lg p-6 relative shadow-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 p-8 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full relative">
             <button
-              className="absolute top-3 right-4 text-gray-600 hover:text-black text-2xl font-bold"
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
               onClick={() => setSelectedFPO(null)}
             >
               &times;
             </button>
-            <h2 className="text-3xl font-bold mb-6 text-blue-900">{selectedFPO.entity_name}</h2>
-
+            <h2 className="text-2xl font-bold mb-4">{selectedFPO.entity_name}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div><strong>FPO ID:</strong> {selectedFPO.fpo_id}</div>
               <div><strong>Constitution:</strong> {selectedFPO.constitution}</div>
@@ -96,37 +109,36 @@ const FPO = () => {
               <div><strong>Address:</strong> {selectedFPO.address}</div>
               <div><strong>State:</strong> {selectedFPO.state}</div>
               <div><strong>District:</strong> {selectedFPO.district}</div>
-              <div><strong>Area of Operation:</strong> {selectedFPO.area_of_operation}</div>
-              <div><strong>Establishment Year:</strong> {selectedFPO.establishment_year}</div>
-              <div><strong>Major Crops:</strong> {selectedFPO.major_crop_produced.join(', ')}</div>
+              <div><strong>Area:</strong> {selectedFPO.area_of_operation}</div>
+              <div><strong>Est. Year:</strong> {selectedFPO.establishment_year}</div>
+              <div><strong>Crops:</strong> {selectedFPO.major_crop_produced.join(', ')}</div>
               <div><strong>Turnover:</strong> ₹{selectedFPO.previous_year_turnover}</div>
-              <div><strong>Contact Name:</strong> {selectedFPO.contact_person_name}</div>
-              <div><strong>Contact Phone:</strong> {selectedFPO.contact_person_phone}</div>
-              <div><strong>PAN No:</strong> {selectedFPO.pan_no}</div>
-              <div><strong>PAN Copy Collected:</strong> {selectedFPO.is_pan_copy_collected ? 'Yes' : 'No'}</div>
+              <div><strong>Contact:</strong> {selectedFPO.contact_person_name}</div>
+              <div><strong>Phone:</strong> {selectedFPO.contact_person_phone}</div>
+              <div><strong>PAN:</strong> {selectedFPO.pan_no}</div>
+              <div><strong>PAN Collected:</strong> {selectedFPO.is_pan_copy_collected ? 'Yes' : 'No'}</div>
               <div><strong>Registration No:</strong> {selectedFPO.registration_no}</div>
-              <div><strong>Director List Collected:</strong> {selectedFPO.is_director_shareholder_list_collected ? 'Yes' : 'No'}</div>
               <div><strong>Active:</strong> {selectedFPO.active ? 'Yes' : 'No'}</div>
               <div><strong>Created:</strong> {new Date(selectedFPO.created_at).toLocaleString()}</div>
               <div><strong>Updated:</strong> {new Date(selectedFPO.updated_at).toLocaleString()}</div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
               {selectedFPO.pan_image && (
                 <div>
-                  <img src={selectedFPO.pan_image} alt="PAN Document" className="rounded shadow w-full" />
+                  <img src={selectedFPO.pan_image} alt="PAN" className="rounded shadow w-full" />
                   <p className="text-xs mt-1 text-center">PAN Image</p>
                 </div>
               )}
               {selectedFPO.incorporation_doc_img && (
                 <div>
-                  <img src={selectedFPO.incorporation_doc_img} alt="Incorporation Doc" className="rounded shadow w-full" />
+                  <img src={selectedFPO.incorporation_doc_img} alt="Incorp Doc" className="rounded shadow w-full" />
                   <p className="text-xs mt-1 text-center">Incorporation Document</p>
                 </div>
               )}
               {selectedFPO.registration_no_img && (
                 <div>
-                  <img src={selectedFPO.registration_no_img} alt="Registration No" className="rounded shadow w-full" />
+                  <img src={selectedFPO.registration_no_img} alt="Reg No" className="rounded shadow w-full" />
                   <p className="text-xs mt-1 text-center">Registration Document</p>
                 </div>
               )}
