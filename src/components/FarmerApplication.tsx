@@ -21,7 +21,7 @@ const FarmerApplication: React.FC = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://dev-api.farmeasytechnologies.com/api/applications/${farmerId}?skip=0&limit=10`
+          `https://dev-api.farmeasytechnologies.com/api/applications/${farmerId}`
         );
         setApplications(response.data?.data || []);
       } catch (err) {
@@ -50,7 +50,7 @@ const FarmerApplication: React.FC = () => {
       </h2>
 
       {applications.length === 0 ? (
-        <p className="text-gray-500">No applications found for this farmer.</p>
+        <p className="text-red-500">No applications found for this farmer.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
