@@ -61,8 +61,8 @@ const FPO = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">All FPOs</h1>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
+        <table className="w-full text-sm text-left bg-white">
+          <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
             <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
               <th className="px-4 py-2 border">Entity Name</th>
               <th className="px-4 py-2 border">FPO ID</th>
@@ -79,8 +79,8 @@ const FPO = () => {
                 onClick={() => setSelectedFPO(fpo)}
                 className="cursor-pointer hover:bg-gray-50 text-sm"
               >
-                <td className="px-4 py-2 border">{fpo.entity_name}</td>
-                <td className="px-4 py-2 border">{fpo.fpo_id}</td>
+                <td className="px-4 py-3 font-medium text-gray-900">{fpo.entity_name}</td>
+                <td className="px-4 py-3 text-blue-600 font-semibold">{fpo.fpo_id}</td>
                 <td className="px-4 py-2 border">{fpo.state}</td>
                 <td className="px-4 py-2 border">{fpo.district}</td>
                 <td className="px-4 py-2 border">{fpo.contact_person_name} ({fpo.contact_person_phone})</td>

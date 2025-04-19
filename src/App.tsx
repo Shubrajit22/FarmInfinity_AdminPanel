@@ -9,6 +9,7 @@ import Agent from './components/Agent';
 import BankAgent from './components/BankAgent';
 import FarmerDetails from './components/FarmerDetails';
 import FPO from './components/FPO';
+import FarmerApplication from './components/FarmerApplication';
 
 function App() {
  
@@ -25,7 +26,8 @@ function App() {
           <Route path="/farmers" element={<Farmers />} />
           <Route path="/agent" element={<Agent />} />
           <Route path="/bank-agent" element={<BankAgent />} />
-          <Route path="/farmers/:id" element={<FarmerDetails />} />
+          <Route path="/farmers_details/:id" element={<FarmerDetails />} />
+          <Route path="/farmers_applications/:id" element={<FarmerApplication />} />
           {/* Add more routes here if needed */}
         </Routes>
       </div>
