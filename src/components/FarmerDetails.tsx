@@ -206,35 +206,12 @@ const FarmerDetails = () => {
     }
 
     switch (activeTab) {
-      case "Profile":
-        return (
-          <div className="space-y-2">
-            <div>
-              <strong>Name:</strong> {renderNA(farmer.name)}
-            </div>
-            <div>
-              <strong>Farmer Id:</strong> {renderNA(farmer.farmer_id)}
-            </div>
-            <div>
-              <strong>Phone:</strong> {renderNA(farmer.phone_no)}
-            </div>
-            <div>
-              <strong>Referral Id:</strong> {renderNA(farmer.referral_id)}
-            </div>
-            <div>
-              <strong>Village:</strong> {renderNA(farmer.village)}
-            </div>
-            <div>
-              <strong>Status:</strong> {renderNA(farmer.status)}
-            </div>
-            <div>
-              <strong>Created On:</strong>{" "}
-              {farmer.created_at
-                ? renderNA(new Date(farmer.created_at).toLocaleDateString())
-                : "N/A"}
-            </div>
-          </div>
-        );
+     
+        case "Profile":
+          return (
+            
+            <FarmerProfileTab application_id={id || ""} />
+          );
       case "KYC":
         if (!kyc) {
           return <div>No KYC information available.</div>;
@@ -571,3 +548,62 @@ const FarmerDetails = () => {
 };
 
 export default FarmerDetails;
+
+
+const FarmerProfileTab = ({ application_id }: { application_id: string | "" }) => {
+  const [bio, setBio] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBio = async () => {
+      try {
+        const historyRes = await axios.get(`https://dev-api.farmeasytechnologies.com/api/bio-histories/${application_id}`);
+        const histories = historyRes.data;
+
+        if (histories.length === 0) {
+          console.warn("No bio history found.");
+          setLoading(false);
+          return;
+        }
+
+        const latestBioVersionId = histories[0].bio_version_id;
+        const bioRes = await axios.get(`https://dev-api.farmeasytechnologies.com/api/bio/${latestBioVersionId}`);
+        setBio(bioRes.data);
+      } catch (err) {
+        console.error("Failed to fetch bio:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (application_id) fetchBio();
+  }, [application_id]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!bio) return <div>No bio data available.</div>;
+
+  return (
+    <div className="p-4 space-y-4">
+      <h2 className="text-xl font-semibold">Farmer Profile</h2>
+      <div><strong>Name:</strong> {bio.name}</div>
+      <div><strong>DOB:</strong> {bio.dob}</div>
+      <div><strong>Email:</strong> {bio.email}</div>
+      <div><strong>Gender:</strong> {bio.gender}</div>
+      <div><strong>Alt Phone:</strong> {bio.alt_phone}</div>
+      <div><strong>Address:</strong> {bio.full_address}</div>
+      <div><strong>Village:</strong> {bio.village}</div>
+      <div><strong>District:</strong> {bio.district}</div>
+      <div><strong>City:</strong> {bio.city}</div>
+      <div><strong>State:</strong> {bio.state}</div>
+      <div><strong>PIN:</strong> {bio.pin}</div>
+      <div><strong>FPO Name:</strong> {bio.fpo_name?.join(", ")}</div>
+      <div><strong>FPO Code:</strong> {bio.fpo_code?.join(", ")}</div>
+      {bio.photo && (
+        <div>
+          <strong>Photo:</strong><br />
+          <img src={bio.photo} alt="Farmer" className="w-32 h-32 object-cover rounded" />
+        </div>
+      )}
+    </div>
+  );
+};
