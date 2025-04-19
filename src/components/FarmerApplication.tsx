@@ -3,10 +3,11 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
 interface Application {
-  _id: string;
-  createdAt: string;
-  status: string;
-  
+  id: string;
+  farmer_id: string;
+  application_no: string;
+  status: number;
+  timestamp: string;
 }
 
 const FarmerApplication: React.FC = () => {
@@ -23,7 +24,7 @@ const FarmerApplication: React.FC = () => {
         const response = await axios.get(
           `https://dev-api.farmeasytechnologies.com/api/applications/${farmerId}`
         );
-        setApplications(response.data?.data || []);
+        setApplications(response.data || []);
       } catch (err) {
         setError('Failed to fetch applications.');
       } finally {
@@ -38,6 +39,17 @@ const FarmerApplication: React.FC = () => {
 
   const handleRowClick = (appId: string) => {
     navigate(`/farmers_details/${appId}`);
+  };
+
+  const formatStatus = (status: number) => {
+    switch (status) {
+      case 1:
+        return { label: 'Approved', className: 'bg-green-100 text-green-700' };
+      case 2:
+        return { label: 'Rejected', className: 'bg-red-100 text-red-700' };
+      default:
+        return { label: 'Pending', className: 'bg-yellow-100 text-yellow-700' };
+    }
   };
 
   if (loading) return <div className="p-4">Loading applications...</div>;
@@ -56,37 +68,32 @@ const FarmerApplication: React.FC = () => {
           <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
             <thead>
               <tr className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wider">
-                <th className="p-4 text-left">Application ID</th>
+                <th className="p-4 text-left">Application No</th>
                 <th className="p-4 text-left">Status</th>
                 <th className="p-4 text-left">Created At</th>
               </tr>
             </thead>
             <tbody>
-              {applications.map((app) => (
-                <tr
-                  key={app._id}
-                  onClick={() => handleRowClick(app._id)}
-                  className="cursor-pointer hover:bg-gray-50 transition"
-                >
-                  <td className="p-4 border-t">{app._id}</td>
-                  <td className="p-4 border-t">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        app.status === 'Approved'
-                          ? 'bg-green-100 text-green-700'
-                          : app.status === 'Rejected'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {app.status}
-                    </span>
-                  </td>
-                  <td className="p-4 border-t">
-                    {new Date(app.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
+              {applications.map((app) => {
+                const { label, className } = formatStatus(app.status);
+                return (
+                  <tr
+                    key={app.id}
+                    onClick={() => handleRowClick(app.id)}
+                    className="cursor-pointer hover:bg-gray-50 transition"
+                  >
+                    <td className="p-4 border-t">{app.application_no}</td>
+                    <td className="p-4 border-t">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${className}`}>
+                        {label}
+                      </span>
+                    </td>
+                    <td className="p-4 border-t">
+                      {new Date(app.timestamp).toLocaleDateString()}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
